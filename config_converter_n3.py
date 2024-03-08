@@ -112,6 +112,30 @@ def converter_HLA(primary_config_d: dict) -> dict:
         return {}
     return new_config_d
 
+
+def converter_smallRNA(primary_config_d: dict) -> dict:
+    try:
+        new_config_d = primary_config_d
+        new_config_d['patientID2'] = primary_config_d['patientId2']
+        for sample_content in primary_config_d['taskSampleList']:
+            if sample_content['sampleType'].strip().lower() == 'tumor':
+                new_config_d['tumorName'] = sample_content['sampleName']
+                new_config_d['tumorPath'] = sample_content['faFile']
+                continue
+            else:
+                pass
+            if sample_content['sampleType'].strip().lower() == 'normal':
+                new_config_d['normalName'] = sample_content['sampleName']
+                new_config_d['normalPath'] = sample_content['faFile']
+                continue
+            else:
+                pass
+    except Exception as e:
+        print(str(e))
+        return {}
+    return new_config_d
+
+
 def steward(primary_config:str) -> int:
     work_dir = os.path.dirname(primary_config)
     try:
@@ -130,6 +154,8 @@ def steward(primary_config:str) -> int:
         new_config_d = converter_lncRNA(primary_config_d)
     elif pipeline_name == 'HLA':
         new_config_d = converter_HLA(primary_config_d)
+    elif pipeline_name == 'smallRNA':
+        new_config_d = converter_smallRNA(primary_config_d)
     else:
         return 1
     if len(new_config_d) == 0:
